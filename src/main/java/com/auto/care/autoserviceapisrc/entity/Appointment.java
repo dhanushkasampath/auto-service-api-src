@@ -13,10 +13,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Data
 @Table(name = "appointment")
-public class Appointment {
+public class Appointment extends AbstractEntity{
 
     @Id
-    private Long id;
+    private Long appointmentId;
 
     private LocalDateTime timestamp;
 
@@ -24,7 +24,7 @@ public class Appointment {
 
     private LocalDateTime appointmentDate2;
 
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING)// When we use like this db doesn't allow to enter values other than the given values
     private AppointmentStatusEnum status;
 
 }
