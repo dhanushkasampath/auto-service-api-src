@@ -9,15 +9,19 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@Table(name = "service_type")
-public class ServiceType {
+@Table(name = "vehicle")
+public class Vehicle {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long serviceTypeId;
-    private String name;
-    private String description;
+    private Long id;
+    private String registrationNo;
+    private String type;
+    private String model;
+    private String year;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "serviceId", nullable = false)
-    private Service service;
+    @JoinColumn(name = "customerId", nullable = false)
+    private Customer customer;
+
 }
