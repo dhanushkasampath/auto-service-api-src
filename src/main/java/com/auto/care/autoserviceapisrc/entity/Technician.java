@@ -28,6 +28,6 @@ public class Technician {
     private String description;
     @Enumerated(EnumType.STRING)
     private TechnicianTypeEnum type;
-    @ManyToMany(mappedBy = "technician")
+    @ManyToMany(mappedBy = "technicianList")
     private List<Service> serviceList;
 }
