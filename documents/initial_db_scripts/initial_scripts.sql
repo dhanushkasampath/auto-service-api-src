@@ -1,0 +1,14 @@
+INSERT INTO `auto_care`.`service_type` (`service_type_id`, `name`) VALUES ('1', 'Lube/oil/filter change');
+INSERT INTO `auto_care`.`service_type` (`service_type_id`, `name`) VALUES ('2', 'Radiator Flush & Fill Service');
+INSERT INTO `auto_care`.`service_type` (`service_type_id`, `name`) VALUES ('3', 'Transmission Fluid Service');
+INSERT INTO `auto_care`.`service_type` (`service_type_id`, `name`) VALUES ('4', 'A/C Recharge & Diagnostic Service');
+INSERT INTO `auto_care`.`service_type` (`service_type_id`, `name`) VALUES ('5', 'Timing Belt Replacement');
+INSERT INTO `auto_care`.`service_type` (`service_type_id`, `name`) VALUES ('6', 'Tire rotation and balance');
+INSERT INTO `auto_care`.`service_type` (`service_type_id`, `name`) VALUES ('7', 'Battery replacement');
+INSERT INTO `auto_care`.`service_type` (`service_type_id`, `name`) VALUES ('8', 'Anti-Lock system diagnosis');
+INSERT INTO `auto_care`.`service_type` (`service_type_id`, `name`) VALUES ('9', 'Axle Work Bearings/Seals');
+INSERT INTO `auto_care`.`service_type` (`service_type_id`, `name`) VALUES ('10', 'Shock and Strut Replacement');
+INSERT INTO `auto_care`.`service_type` (`service_type_id`, `name`) VALUES ('11', 'Starters/Alternators/Heater cores');
+INSERT INTO `auto_care`.`service_type` (`service_type_id`, `name`) VALUES ('12', 'Suspension system service');
+INSERT INTO `auto_care`.`service_type` (`service_type_id`, `name`) VALUES ('13', 'Alignments');
+INSERT INTO `auto_care`.`service_type` (`service_type_id`, `name`) VALUES ('14', 'Fleet service/maintenance');
