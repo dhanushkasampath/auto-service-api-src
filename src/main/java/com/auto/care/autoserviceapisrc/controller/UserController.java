@@ -14,6 +14,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.UnsupportedEncodingException;
+
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/v1/user")
@@ -65,6 +67,24 @@ public class UserController {
             }
 
         }
+    }
+
+    /**
+     * This end point get called when user clicks forget password link -> send email to system saved email if user entered one also same as that ->
+     * notifying user saying that password reset link send to particular email
+     *
+     * @param email
+     * @return
+     * @throws AutoServiceException
+     * @throws UnsupportedEncodingException
+     */
+    @PutMapping(path = "/forget-password")
+    public ResponseEntity<String> forgetPassword(
+            @RequestParam
+            String email) throws AutoServiceException, UnsupportedEncodingException {
+        logger.info("Request received to send a mail to {} with invitation link. user is going to reset the password", email);
+        userService.forgetPassword(email);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }

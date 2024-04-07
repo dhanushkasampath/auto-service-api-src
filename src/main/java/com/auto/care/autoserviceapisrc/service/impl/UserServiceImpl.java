@@ -6,18 +6,17 @@ import com.auto.care.autoserviceapisrc.config.security.UserJwtTokenCreator;
 import com.auto.care.autoserviceapisrc.entity.User;
 import com.auto.care.autoserviceapisrc.exception.AutoServiceException;
 import com.auto.care.autoserviceapisrc.repository.UserRepository;
+import com.auto.care.autoserviceapisrc.service.EmailService;
 import com.auto.care.autoserviceapisrc.service.UserService;
+import com.auto.care.autoserviceapisrc.util.EmailConstants;
 import com.auto.care.autoserviceapisrc.util.JwtTokenTypeEnum;
 import com.auto.care.autoserviceapisrc.util.UserLoginTypeEnum;
-import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -31,75 +30,15 @@ public class UserServiceImpl implements UserService {
     private String secretKey;
     @Value("${invitation.email.forget.password.url}")
     private String forgetPasswordLink;
-    @Value("${invitation.email.initial.login.url}")
-    private String initialLoginUrl;
 
     private final UserRepository userRepository;
-    @Autowired
-    private ModelMapper modelMapper;
-
     private final UserJwtTokenCreator userJwtTokenCreator;
-    @Autowired
-    private EncryptDecryptService encryptDecryptService;
-    @Autowired
-    private EmailService emailService;
-    @Autowired
-    private UserTypeService userTypeService;
+    private final EmailService emailService;
 
-    public UserServiceImpl(UserRepository userRepository, UserJwtTokenCreator userJwtTokenCreator) {
+    public UserServiceImpl(UserRepository userRepository, UserJwtTokenCreator userJwtTokenCreator, EmailService emailService) {
         this.userRepository = userRepository;
         this.userJwtTokenCreator = userJwtTokenCreator;
-    }
-
-    @Override
-    public void create(UserDto userDTO) throws HotelBookingException, UnsupportedEncodingException {
-        logger.debug("create method started");
-        User user = map(userDTO, User.class);
-        user.setUserType(userTypeService.getUserTypeByType(UserTypeEnum.CUSTOMER));
-        persist(user);
-        //send email
-        generateJwtTokenAndSendEmail(user);
-        logger.debug("create method ended");
-    }
-
-    private void generateJwtTokenAndSendEmail(User user) throws HotelBookingException, UnsupportedEncodingException {
-        String token = userJwtTokenCreator.generateJwtToken(user, JwtTokenTypeEnum.INVITATION_TOKEN);
-        String firstLoginLink = initialLoginUrl.concat(encodeValue(token));
-//        http://localhost:3000/#/auth/DFDSFEEgwewGRWHfr_FsdgsfgSGSHAFGTHHFDSGSg
-        emailService.sendEmail(user.getEmail(), String.format(EmailConstants.INVITATION_EMAIL_CONTENT, firstLoginLink), "First time verification");
-    }
-
-    @Override
-    public User persist(User user) throws HotelBookingException {
-        User userCreated = null;
-        try {
-            userCreated = userRepository.save(user);
-        } catch (DataIntegrityViolationException e) {
-
-            if ((Constants.DUPLICATE_USER_NAME.toLowerCase()).equals(((org.hibernate.exception.ConstraintViolationException) e.getCause()).getConstraintName())) {
-                logger.error("User already exist with username:{}, Enter a unique username", user.getUserName(), e);
-                throw new HotelBookingException(HttpStatus.BAD_REQUEST, String.format("User already exist with username:%s, Enter a unique username", user.getUserName()));
-            }
-
-            if ((Constants.DUPLICATE_EMAIL.toLowerCase()).equals(((org.hibernate.exception.ConstraintViolationException) e.getCause()).getConstraintName())) {
-                logger.error("User already exist with email:{} ,Enter a unique email {}", user.getEmail(), e);
-                throw new HotelBookingException(HttpStatus.BAD_REQUEST, String.format("User already exist with email:%s, Enter a unique email", user.getEmail()));
-            }
-
-            logger.error("Constraint violation for user save request {}, {} ", e.getLocalizedMessage(), e);
-            throw new HotelBookingException(HttpStatus.BAD_REQUEST, "Constraint violation for user");
-        }
-        return userCreated;
-    }
-
-    @Override
-    public User findByUserName(String userName) throws HotelBookingException {
-        User user = userRepository.findByUserName(userName);
-        if(user == null){
-            logger.error("user not found for username:{}", userName);
-            throw new HotelBookingException(HttpStatus.BAD_REQUEST, "user not found for username");
-        }
-        return user;
+        this.emailService = emailService;
     }
 
     @Override
@@ -173,29 +112,11 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    @Override
-    public User findOne(Long userId) throws HotelBookingException {
-        Optional<User> user = userRepository.findById(userId);
-
-        if (user.isPresent()) {
-            return user.get();
-        } else {
-            logger.info("User not found for user id {}", user);
-            throw new HotelBookingException(HttpStatus.NOT_FOUND, "User not found");
-        }
-    }
-
     private String encodeValue(String value) throws UnsupportedEncodingException {
         return URLEncoder.encode(value, String.valueOf(StandardCharsets.UTF_8));
     }
 
     private void validateAndUpdatePassword(String providedEncryptedPassword, User user) throws AutoServiceException {
-//        try {
-//            encryptDecryptService.decrypt(providedEncryptedPassword, secretKey);
-//        } catch (HotelBookingException e) {
-//            logger.error("Password entered is invalid. Please enter a valid one:{}", providedEncryptedPassword);
-//            throw new HotelBookingException(HttpStatus.BAD_REQUEST, "Password entered is invalid. Please enter a valid one");
-//        }
         Optional<User> optionalUser = userRepository.findById(user.getUserId());
         User userToBeUpdated = null;
         if (optionalUser.isPresent()) {

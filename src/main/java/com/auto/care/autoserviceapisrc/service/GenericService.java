@@ -8,7 +8,6 @@ import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
-
 import java.lang.reflect.Type;
 
 public interface GenericService {
@@ -27,7 +26,7 @@ public interface GenericService {
         }
     }
 
-    default < T > T map(Object sourceEntity, Type destinationType) throws HotelBookingException {
+    default < T > T map(Object sourceEntity, Type destinationType) throws AutoServiceException {
         try {
             return modelMapper.map(sourceEntity, destinationType);
         }

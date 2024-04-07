@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Date;
@@ -26,7 +25,6 @@ public class UserJwtTokenCreator {
     private static final String JWT_HEADER_TYPE_KEY = "typ";
     private static final String JWT_HEADER_TYPE_VALUE = "JWT";
 
-
     @Value("${security.jwt.sign.key}")
     private String jwtSignKey;
 
@@ -39,8 +37,11 @@ public class UserJwtTokenCreator {
     @Value("${security.email.invitation.jwt.expiretime.hours}")
     private Integer emailInvitationJwtExpireTimeInHours;
 
-    @Autowired
-    private ZoneId zoneId;
+    private final ZoneId zoneId;
+
+    public UserJwtTokenCreator(ZoneId zoneId) {
+        this.zoneId = zoneId;
+    }
 
     public String generateJwtToken(User user, JwtTokenTypeEnum type) {
         logger.debug("generating JWT token of type:{} to user:{}", type, user.getUserName());
@@ -86,7 +87,7 @@ public class UserJwtTokenCreator {
         customerDetailsMap.put(Constants.USER_NAME_KEY, user.getUserName());
         customerDetailsMap.put(Constants.USER_EMAIL_KEY, user.getEmail());
 
-        customerDetailsMap.put(Constants.USER_TYPE_KEY, user.getUserType().getUserType().toString());
+        customerDetailsMap.put(Constants.USER_TYPE_KEY, user.getUserType().toString());
 
         logger.debug("claims size : {}", customerDetailsMap.size());
 
@@ -115,11 +116,11 @@ public class UserJwtTokenCreator {
         customerDetailsMap.put(Constants.USER_ID_KEY, user.getUserId());
         customerDetailsMap.put(Constants.USER_NAME_KEY, user.getUserName());
         customerDetailsMap.put(Constants.USER_EMAIL_KEY, user.getEmail());
-        customerDetailsMap.put(Constants.USER_TYPE_KEY, user.getUserType().getUserType().toString());
+        customerDetailsMap.put(Constants.USER_TYPE_KEY, user.getUserType().toString());
 
         if (type.equals(JwtTokenTypeEnum.INVITATION_TOKEN)) {
             String pw = user.getPassword() == null ? passwordKey : user.getPassword();
-            customerDetailsMap.put(Constants.USER_ONE_TIME_AUTH_KEY, (pw + "_" + user.getCreatedDate().toString()).hashCode());
+            customerDetailsMap.put(Constants.USER_ONE_TIME_AUTH_KEY, (pw + "_" + user.getEmail()).hashCode());
         }
         return customerDetailsMap;
     }
