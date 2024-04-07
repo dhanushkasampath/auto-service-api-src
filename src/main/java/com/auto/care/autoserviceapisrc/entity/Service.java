@@ -13,7 +13,6 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.ManyToMany;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -42,8 +41,13 @@ public class Service extends AbstractEntity {
     @JoinColumn(name = "appointmentId")
     private Appointment appointment;
 
-    @OneToMany(mappedBy = "service", fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL)
+//    @OneToMany(mappedBy = "service", fetch = FetchType.LAZY,
+//            cascade = CascadeType.ALL)
+//    private List<ServiceType> serviceTypeList;
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(name = "service_service_type",
+            joinColumns = {@JoinColumn(name = "service_id")},
+            inverseJoinColumns = {@JoinColumn(name = "service_type_id")})
     private List<ServiceType> serviceTypeList;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
