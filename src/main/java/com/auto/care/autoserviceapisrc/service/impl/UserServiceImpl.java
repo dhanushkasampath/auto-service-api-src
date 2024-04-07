@@ -1,6 +1,14 @@
 package com.auto.care.autoserviceapisrc.service.impl;
 
+import com.auto.care.autoserviceapisrc.beans.UserLoginRequestDto;
+import com.auto.care.autoserviceapisrc.beans.UserLoginResponseDto;
+import com.auto.care.autoserviceapisrc.config.security.UserJwtTokenCreator;
+import com.auto.care.autoserviceapisrc.entity.User;
+import com.auto.care.autoserviceapisrc.exception.AutoServiceException;
+import com.auto.care.autoserviceapisrc.repository.UserRepository;
 import com.auto.care.autoserviceapisrc.service.UserService;
+import com.auto.care.autoserviceapisrc.util.JwtTokenTypeEnum;
+import com.auto.care.autoserviceapisrc.util.UserLoginTypeEnum;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,18 +33,23 @@ public class UserServiceImpl implements UserService {
     private String forgetPasswordLink;
     @Value("${invitation.email.initial.login.url}")
     private String initialLoginUrl;
-    @Autowired
-    private UserRepository userRepository;
+
+    private final UserRepository userRepository;
     @Autowired
     private ModelMapper modelMapper;
-    @Autowired
-    private UserJwtTokenCreator userJwtTokenCreator;
+
+    private final UserJwtTokenCreator userJwtTokenCreator;
     @Autowired
     private EncryptDecryptService encryptDecryptService;
     @Autowired
     private EmailService emailService;
     @Autowired
     private UserTypeService userTypeService;
+
+    public UserServiceImpl(UserRepository userRepository, UserJwtTokenCreator userJwtTokenCreator) {
+        this.userRepository = userRepository;
+        this.userJwtTokenCreator = userJwtTokenCreator;
+    }
 
     @Override
     public void create(UserDto userDTO) throws HotelBookingException, UnsupportedEncodingException {
@@ -90,7 +103,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserLoginResponseDto userGeneralLogin(UserLoginRequestDto userLoginRequestDto) throws HotelBookingException {
+    public UserLoginResponseDto userGeneralLogin(UserLoginRequestDto userLoginRequestDto) throws AutoServiceException {
         logger.debug("userGeneralLogin method started. Login requested user_name : {}", userLoginRequestDto.getUserName());
 
         String providedEncryptedPassword = userLoginRequestDto.getPassword();
@@ -99,13 +112,13 @@ public class UserServiceImpl implements UserService {
 
         if (user == null) {
             logger.error("User Authentication Failed");
-            throw new HotelBookingException(HttpStatus.UNAUTHORIZED, "User Authentication Failed");
+            throw new AutoServiceException(HttpStatus.UNAUTHORIZED, "User Authentication Failed");
         }
 
         String persistPassword = user.getPassword();//this is already an encrypted one
         if (!providedEncryptedPassword.equalsIgnoreCase(persistPassword)) {
             logger.error("Password not matched for user name:{}", userLoginRequestDto.getUserName());
-            throw new HotelBookingException(HttpStatus.UNAUTHORIZED, "Invalid User Credentials");
+            throw new AutoServiceException(HttpStatus.UNAUTHORIZED, "Invalid User Credentials");
         } else {
             String token = userJwtTokenCreator.generateJwtToken(user, JwtTokenTypeEnum.AUTHORIZED_TOKEN);
             logger.debug("user successfully logged in.");
@@ -114,7 +127,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void userSpecialLogin(UserLoginRequestDto userLoginRequestDto, UserLoginTypeEnum userLoginType) throws HotelBookingException {
+    public void userSpecialLogin(UserLoginRequestDto userLoginRequestDto, UserLoginTypeEnum userLoginType) throws AutoServiceException {
         logger.debug("userSpecialLogin method started. Login requested user_name : {}", userLoginRequestDto.getUserName());
         User user = null;
         String providedEncryptedPassword = userLoginRequestDto.getPassword();//should be an encoded one
@@ -126,7 +139,7 @@ public class UserServiceImpl implements UserService {
 
             if (user.getPassword() != null) {
                 logger.error("Password already exist for user, userId: {}, Access Denied", user.getUserId());
-                throw new HotelBookingException(HttpStatus.UNAUTHORIZED, "Password already exist for user");
+                throw new AutoServiceException(HttpStatus.UNAUTHORIZED, "Password already exist for user");
             }
 
         } else if (userLoginType.equals(UserLoginTypeEnum.FORGET_PASSWORD_LOGIN)) {
@@ -137,12 +150,12 @@ public class UserServiceImpl implements UserService {
             validateAndUpdatePassword(providedEncryptedPassword, user);
         } else {
             logger.error("User authentication is invalid. Please try again.");
-            throw new HotelBookingException(HttpStatus.UNAUTHORIZED, "User authentication is invalid. Please try again.");
+            throw new AutoServiceException(HttpStatus.UNAUTHORIZED, "User authentication is invalid. Please try again.");
         }
     }
 
     @Override
-    public void forgetPassword(String email) throws HotelBookingException, UnsupportedEncodingException {
+    public void forgetPassword(String email) throws AutoServiceException, UnsupportedEncodingException {
         User user = userRepository.findOneByEmail(email);
         if (user != null) {
             String content;
@@ -156,7 +169,7 @@ public class UserServiceImpl implements UserService {
             emailService.sendEmail(email, content, "Forgot password");
         } else {
             logger.error("User with email:{} not found.", email);
-            throw new HotelBookingException(HttpStatus.BAD_REQUEST, String.format("User with email:%s not found.", email));
+            throw new AutoServiceException(HttpStatus.BAD_REQUEST, String.format("User with email:%s not found.", email));
         }
     }
 
@@ -176,7 +189,7 @@ public class UserServiceImpl implements UserService {
         return URLEncoder.encode(value, String.valueOf(StandardCharsets.UTF_8));
     }
 
-    private void validateAndUpdatePassword(String providedEncryptedPassword, User user) throws HotelBookingException {
+    private void validateAndUpdatePassword(String providedEncryptedPassword, User user) throws AutoServiceException {
 //        try {
 //            encryptDecryptService.decrypt(providedEncryptedPassword, secretKey);
 //        } catch (HotelBookingException e) {
@@ -191,7 +204,7 @@ public class UserServiceImpl implements UserService {
             userRepository.save(userToBeUpdated);
         } else {
             logger.error("Password update failed.User not found for Id:{}", user.getUserId());
-            throw new HotelBookingException(HttpStatus.INTERNAL_SERVER_ERROR, "Password update failed. User not found");
+            throw new AutoServiceException(HttpStatus.INTERNAL_SERVER_ERROR, "Password update failed. User not found");
         }
     }
 }

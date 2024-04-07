@@ -13,3 +13,8 @@ Branching strategy
 Branches related to 8.743.20.0 release
 
 * task/BO-1012-implement-entity-structure
+* task/BO-1013-implement-login-endpoint
+
+
+
+Here I have used java 17 new feature; enhanced switch statement
