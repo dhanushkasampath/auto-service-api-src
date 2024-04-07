@@ -41,9 +41,6 @@ public class Service extends AbstractEntity {
     @JoinColumn(name = "appointmentId")
     private Appointment appointment;
 
-//    @OneToMany(mappedBy = "service", fetch = FetchType.LAZY,
-//            cascade = CascadeType.ALL)
-//    private List<ServiceType> serviceTypeList;
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(name = "service_service_type",
             joinColumns = {@JoinColumn(name = "service_id")},
