@@ -53,7 +53,7 @@ public class UserController {
                 return new ResponseEntity<>(HttpStatus.OK);
             }
 
-            case FORGET_PASSWORD_LOGIN -> {
+            case FORGET_PASSWORD_LOGIN -> {// This case is called when user added a new password after clicking on password-reset link
                 logger.debug("Login to set a new password for forget password with userName:{}", userLoginRequestDto.getUserName());
                 userService.userSpecialLogin(userLoginRequestDto, UserLoginTypeEnum.FORGET_PASSWORD_LOGIN);
                 logger.debug("Password updated successfully for username : {}", userLoginRequestDto.getUserName());
@@ -69,7 +69,7 @@ public class UserController {
     }
 
     /**
-     * This end point get called when user clicks forget password link -> send email to system saved email if user entered one also same as that ->
+     * This end point get called when user clicks forget password link -> enter the  email given to system -> if user entered one similar to system saved email ->
      * notifying user saying that password reset link send to particular email
      *
      * @param email

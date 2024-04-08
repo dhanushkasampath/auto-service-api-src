@@ -2,7 +2,6 @@ package com.auto.care.autoserviceapisrc.service;
 
 import com.auto.care.autoserviceapisrc.beans.UserLoginRequestDto;
 import com.auto.care.autoserviceapisrc.beans.UserLoginResponseDto;
-import com.auto.care.autoserviceapisrc.entity.User;
 import com.auto.care.autoserviceapisrc.exception.AutoServiceException;
 import com.auto.care.autoserviceapisrc.util.UserLoginTypeEnum;
 

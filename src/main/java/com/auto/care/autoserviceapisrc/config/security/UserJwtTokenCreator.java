@@ -53,26 +53,26 @@ public class UserJwtTokenCreator {
 
         if (type.equals(JwtTokenTypeEnum.AUTHORIZED_TOKEN)) {
             jwtToken = Jwts.builder()
-                    .setIssuedAt(currentDateTime)
-                    .setExpiration(new Date(expireDateTime))
-                    .addClaims(getCustomerDetailMap(user, JwtTokenTypeEnum.AUTHORIZED_TOKEN))
-                    .setHeaderParam(JWT_HEADER_TYPE_KEY, JWT_HEADER_TYPE_VALUE)
-                    .signWith(
-                            SignatureAlgorithm.HS256,
-                            jwtSignKey.getBytes()
-                    )
+                .setIssuedAt(currentDateTime)
+                .setExpiration(new Date(expireDateTime))
+                .addClaims(getCustomerDetailMap(user, JwtTokenTypeEnum.AUTHORIZED_TOKEN))
+                .setHeaderParam(JWT_HEADER_TYPE_KEY, JWT_HEADER_TYPE_VALUE)
+                .signWith(
+                    SignatureAlgorithm.HS256,
+                    jwtSignKey.getBytes()
+                )
                     .compact();
         } else if (type.equals(JwtTokenTypeEnum.INVITATION_TOKEN)) {
             jwtToken = Jwts.builder()
-                    .setIssuedAt(currentDateTime)
-                    .setExpiration(new Date(emailInvitationExpireDateTime))
-                    .addClaims(getCustomerDetailMap(user, JwtTokenTypeEnum.INVITATION_TOKEN))
-                    .setHeaderParam(JWT_HEADER_TYPE_KEY, JWT_HEADER_TYPE_VALUE)
-                    .signWith(
-                            SignatureAlgorithm.HS256,
-                            jwtSignKey.getBytes()
-                    )
-                    .compact();
+                .setIssuedAt(currentDateTime)
+                .setExpiration(new Date(emailInvitationExpireDateTime))
+                .addClaims(getCustomerDetailMap(user, JwtTokenTypeEnum.INVITATION_TOKEN))
+                .setHeaderParam(JWT_HEADER_TYPE_KEY, JWT_HEADER_TYPE_VALUE)
+                .signWith(
+                    SignatureAlgorithm.HS256,
+                    jwtSignKey.getBytes()
+                )
+                .compact();
         }
 
         return jwtToken;
@@ -99,8 +99,8 @@ public class UserJwtTokenCreator {
                 .addClaims(customerDetailsMap)
                 .setHeaderParam(JWT_HEADER_TYPE_KEY, JWT_HEADER_TYPE_VALUE)
                 .signWith(
-                        SignatureAlgorithm.HS256,
-                        jwtSignKey.getBytes()
+                    SignatureAlgorithm.HS256,
+                    jwtSignKey.getBytes()
                 )
                 .compact();
     }
