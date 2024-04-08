@@ -85,7 +85,7 @@ public class EmailServiceImpl implements EmailService {
                             "margin: 40px auto; color: #868686 \"> " + content +
                             "   </div>    <div style=\"text-align: center; max-width: 700px; margin: 40px auto; " +
                             "color: #868686 \">        <p style=\"font-size: 17px;\">          " +
-                            "  <br>Yours sincerely,<br>            Angular Whiplash Team<br>       " +
+                            "  <br>Yours sincerely,<br>            Auto Care Service Team<br>       " +
                             "    </p>    </div></div>",
                     "text/html");
             Transport.send(message);

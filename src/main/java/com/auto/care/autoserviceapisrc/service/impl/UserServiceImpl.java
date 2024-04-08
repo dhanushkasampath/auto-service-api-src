@@ -100,7 +100,7 @@ public class UserServiceImpl implements UserService {
             if (!Objects.isNull(user.getPassword())) {
                 String token = userJwtTokenCreator.generateJwtToken(user, JwtTokenTypeEnum.INVITATION_TOKEN);
                 String resetLink = forgetPasswordLink.concat(encodeValue(token));
-                content = String.format(EmailConstants.INVITATION_EMAIL_CONTENT, resetLink);
+                content = String.format(EmailConstants.FORGET_PASSWORD_EMAIL_CONTENT, resetLink);
             } else {
                 content = EmailConstants.INVITATION_EMAIL_CONTACT_ADMIN_CONTENT;
             }
