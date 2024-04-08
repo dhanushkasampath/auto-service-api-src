@@ -5,7 +5,6 @@ import com.auto.care.autoserviceapisrc.beans.UserLoginResponseDto;
 import com.auto.care.autoserviceapisrc.exception.AutoServiceException;
 import com.auto.care.autoserviceapisrc.service.UserService;
 import com.auto.care.autoserviceapisrc.util.UserLoginTypeEnum;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +35,7 @@ public class UserController {
             UserLoginTypeEnum userLoginType,
             @Valid
             @RequestBody
-            UserLoginRequestDto userLoginRequestDto, HttpServletRequest request) throws AutoServiceException {
+            UserLoginRequestDto userLoginRequestDto) throws AutoServiceException {
 
         logger.info("Request received to authenticate, username : {} ", userLoginRequestDto.getUserName());
 
