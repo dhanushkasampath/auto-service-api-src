@@ -9,7 +9,7 @@ import java.io.UnsupportedEncodingException;
 
 public interface UserService extends GenericService {
 
-    UserLoginResponseDto userGeneralLogin(UserLoginRequestDto userLoginRequestDto) throws AutoServiceException;
+    UserLoginResponseDto userGeneralLogin(UserLoginRequestDto userLoginRequestDto, boolean isTriggerOtp) throws AutoServiceException;
 
     void userSpecialLogin(UserLoginRequestDto userLoginRequestDto, UserLoginTypeEnum userLoginTypeEnum) throws AutoServiceException;
 

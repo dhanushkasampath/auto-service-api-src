@@ -27,6 +27,16 @@ public class UserController {
         this.userService = userService;
     }
 
+    /**
+     * This endpoint get called
+     * 1. when user makes the general login with username and password
+     *
+     * 2. when user add a new password after clicking on password-reset link which gets via a mail.
+     * @param userLoginType
+     * @param userLoginRequestDto
+     * @return
+     * @throws AutoServiceException
+     */
     @PostMapping(path = "/login",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -41,15 +51,13 @@ public class UserController {
 
         switch(userLoginType){
             case GENERAL_LOGIN -> {
-                UserLoginResponseDto userLoginResponseDto = userService.userGeneralLogin(userLoginRequestDto);
+                UserLoginResponseDto userLoginResponseDto = userService.userGeneralLogin(userLoginRequestDto, false);
                 logger.debug("User authenticated successfully for username : {}", userLoginRequestDto.getUserName());
                 return new ResponseEntity<>(userLoginResponseDto, HttpStatus.OK);
             }
 
-            case INITIAL_LOGIN -> {
-                logger.debug("Login for the first time with user name:{} ", userLoginRequestDto.getUserName());
-                userService.userSpecialLogin(userLoginRequestDto, UserLoginTypeEnum.INITIAL_LOGIN);
-                logger.debug("Initial login successfully completed for username : {}", userLoginRequestDto.getUserName());
+            case TRIGGER_OTP -> {
+                userService.userGeneralLogin(userLoginRequestDto, true);
                 return new ResponseEntity<>(HttpStatus.OK);
             }
 
@@ -69,7 +77,8 @@ public class UserController {
     }
 
     /**
-     * This end point get called when user clicks forget password link -> enter the  email given to system -> if user entered one similar to system saved email ->
+     * This end point get called when user clicks forget password link -> enter the  email given to system ->
+     * if user entered one similar to system saved email ->
      * notifying user saying that password reset link send to particular email
      *
      * @param email

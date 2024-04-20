@@ -3,8 +3,10 @@ package com.auto.care.autoserviceapisrc.service.impl;
 import com.auto.care.autoserviceapisrc.beans.UserLoginRequestDto;
 import com.auto.care.autoserviceapisrc.beans.UserLoginResponseDto;
 import com.auto.care.autoserviceapisrc.config.security.UserJwtTokenCreator;
+import com.auto.care.autoserviceapisrc.entity.Otp;
 import com.auto.care.autoserviceapisrc.entity.User;
 import com.auto.care.autoserviceapisrc.exception.AutoServiceException;
+import com.auto.care.autoserviceapisrc.repository.OtpRepository;
 import com.auto.care.autoserviceapisrc.repository.UserRepository;
 import com.auto.care.autoserviceapisrc.service.EmailService;
 import com.auto.care.autoserviceapisrc.service.UserService;
@@ -21,6 +23,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -31,17 +34,20 @@ public class UserServiceImpl implements UserService {
     private String forgetPasswordLink;
 
     private final UserRepository userRepository;
+    private final OtpRepository otpRepository;
     private final UserJwtTokenCreator userJwtTokenCreator;
     private final EmailService emailService;
 
-    public UserServiceImpl(UserRepository userRepository, UserJwtTokenCreator userJwtTokenCreator, EmailService emailService) {
+    public UserServiceImpl(UserRepository userRepository, OtpRepository otpRepository,
+                           UserJwtTokenCreator userJwtTokenCreator, EmailService emailService) {
         this.userRepository = userRepository;
+        this.otpRepository = otpRepository;
         this.userJwtTokenCreator = userJwtTokenCreator;
         this.emailService = emailService;
     }
 
     @Override
-    public UserLoginResponseDto userGeneralLogin(UserLoginRequestDto userLoginRequestDto) throws AutoServiceException {
+    public UserLoginResponseDto userGeneralLogin(UserLoginRequestDto userLoginRequestDto, boolean isTriggerOtp) throws AutoServiceException {
         logger.debug("userGeneralLogin method started. Login requested user_name : {}", userLoginRequestDto.getUserName());
 
         String providedEncryptedPassword = userLoginRequestDto.getPassword();
@@ -58,10 +64,29 @@ public class UserServiceImpl implements UserService {
             logger.error("Password not matched for user name:{}", userLoginRequestDto.getUserName());
             throw new AutoServiceException(HttpStatus.UNAUTHORIZED, "Invalid User Credentials");
         } else {
-            String token = userJwtTokenCreator.generateJwtToken(user, JwtTokenTypeEnum.AUTHORIZED_TOKEN);
-            logger.debug("user successfully logged in.");
-            return new UserLoginResponseDto(token);
+            if (isTriggerOtp) {
+                triggerOtp(user.getEmail());
+                return new UserLoginResponseDto();
+            } else {
+                String token = userJwtTokenCreator.generateJwtToken(user, JwtTokenTypeEnum.AUTHORIZED_TOKEN);
+                logger.debug("user successfully logged in.");
+                return new UserLoginResponseDto(token);
+            }
         }
+    }
+
+    private void triggerOtp(String email) {
+        Random random = new Random();
+
+        // Generate a 6-digit random number
+        int randomNumber = random.nextInt(900000) + 100000;
+
+
+        //persits the saved otp in db
+        Otp otp = new Otp();
+        otp.setCode(String.valueOf(randomNumber));
+        otpRepository.save(otp);
+        System.out.println("Generated random number: " + randomNumber);
     }
 
     @Override
@@ -71,7 +96,7 @@ public class UserServiceImpl implements UserService {
         String providedEncryptedPassword = userLoginRequestDto.getPassword();//should be an encoded one
         String providedUserName = userLoginRequestDto.getUserName();
 
-        if (userLoginType.equals(UserLoginTypeEnum.INITIAL_LOGIN)) {
+        if (userLoginType.equals(UserLoginTypeEnum.TRIGGER_OTP)) {
 
             user = userRepository.findByUserName(providedUserName);
 
