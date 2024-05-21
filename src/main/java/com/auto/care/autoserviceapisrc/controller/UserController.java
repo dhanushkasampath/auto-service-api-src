@@ -3,6 +3,7 @@ package com.auto.care.autoserviceapisrc.controller;
 import com.auto.care.autoserviceapisrc.beans.UserLoginRequestDto;
 import com.auto.care.autoserviceapisrc.beans.UserLoginResponseDto;
 import com.auto.care.autoserviceapisrc.exception.AutoServiceException;
+import com.auto.care.autoserviceapisrc.exception.ControllerException;
 import com.auto.care.autoserviceapisrc.service.UserService;
 import com.auto.care.autoserviceapisrc.util.UserLoginTypeEnum;
 import jakarta.validation.Valid;
@@ -70,8 +71,8 @@ public class UserController {
 
             default -> {
                 logger.error("Provided login type is not valid:{}", userLoginType);
-                throw new AutoServiceException(HttpStatus.BAD_REQUEST, "Invalid Login Type");
-            }
+                throw new AutoServiceException("602", "Invalid Login Type");
+            }//HttpStatus.BAD_REQUEST
 
         }
     }
@@ -87,12 +88,20 @@ public class UserController {
      * @throws UnsupportedEncodingException
      */
     @PutMapping(path = "/forget-password")
-    public ResponseEntity<String> forgetPassword(
+    public ResponseEntity<?> forgetPassword(
             @RequestParam
             String email) throws AutoServiceException, UnsupportedEncodingException {
         logger.info("Request received to send a mail to {} with invitation link. user is going to reset the password", email);
-        userService.forgetPassword(email);
-        return new ResponseEntity<>(HttpStatus.OK);
+        try{
+            userService.forgetPassword(email);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (AutoServiceException e) {//every controller should be under these 2 catch blocks always
+            ControllerException ce = new ControllerException(e.getErrorCode(), e.getErrorMessage());
+            return new ResponseEntity<>(ce, HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            ControllerException ce = new ControllerException("650", "Something went wrong in UserController");
+            return new ResponseEntity<>(ce, HttpStatus.BAD_REQUEST);
+        }
     }
 
 }

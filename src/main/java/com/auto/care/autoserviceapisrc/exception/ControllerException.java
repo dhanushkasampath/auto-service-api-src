@@ -7,7 +7,7 @@ import java.io.Serial;
 
 @Component
 @Getter
-public class AutoServiceException extends RuntimeException {
+public class ControllerException extends RuntimeException {
 
     @Serial
     private static final long serialVersionUID = 2881116644451554263L;
@@ -15,13 +15,13 @@ public class AutoServiceException extends RuntimeException {
     private String errorCode;
     private String errorMessage;
 
-    public AutoServiceException(String errorCode, String errorMessage) {
+    public ControllerException(String errorCode, String errorMessage) {
         super();
         this.errorCode = errorCode;
         this.errorMessage = errorMessage;
     }
 
-    public AutoServiceException() {
+    public ControllerException() {
     }
 
 }

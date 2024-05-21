@@ -93,7 +93,7 @@ public class EmailServiceImpl implements EmailService {
         }
         catch ( Exception e ) {
             logger.error("Failed to send the email confirmation of:{}", topic, e);
-            throw new AutoServiceException(HttpStatus.INTERNAL_SERVER_ERROR, String.format("Failed to send the email confirmation of:%s", topic));
-        }
+            throw new AutoServiceException("607", String.format("Failed to send the email confirmation of:%s -> %s", topic, e.getMessage()));
+        }//HttpStatus.INTERNAL_SERVER_ERROR
     }
 }

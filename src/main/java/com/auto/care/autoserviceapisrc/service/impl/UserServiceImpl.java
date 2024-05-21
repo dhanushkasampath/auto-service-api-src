@@ -56,14 +56,14 @@ public class UserServiceImpl implements UserService {
 
         if (user == null) {
             logger.error("User Authentication Failed");
-            throw new AutoServiceException(HttpStatus.UNAUTHORIZED, "User Authentication Failed");
-        }
+            throw new AutoServiceException("603", "User Authentication Failed");
+        }//HttpStatus.UNAUTHORIZED
 
         String persistPassword = user.getPassword();//this is already an encrypted one
         if (!providedEncryptedPassword.equalsIgnoreCase(persistPassword)) {
             logger.error("Password not matched for user name:{}", userLoginRequestDto.getUserName());
-            throw new AutoServiceException(HttpStatus.UNAUTHORIZED, "Invalid User Credentials");
-        } else {
+            throw new AutoServiceException("604", "Invalid User Credentials");
+        } else {//HttpStatus.UNAUTHORIZED
             if (isTriggerOtp) {
                 triggerOtp(user.getEmail());
                 return new UserLoginResponseDto();
@@ -102,8 +102,8 @@ public class UserServiceImpl implements UserService {
 
             if (user.getPassword() != null) {
                 logger.error("Password already exist for user, userId: {}, Access Denied", user.getUserId());
-                throw new AutoServiceException(HttpStatus.UNAUTHORIZED, "Password already exist for user");
-            }
+                throw new AutoServiceException("605", "Password already exist for user");
+            }//HttpStatus.UNAUTHORIZED
 
         } else if (userLoginType.equals(UserLoginTypeEnum.FORGET_PASSWORD_LOGIN)) {
             user = userRepository.findOneByEmail(providedUserName);
@@ -113,8 +113,8 @@ public class UserServiceImpl implements UserService {
             validateAndUpdatePassword(providedEncryptedPassword, user);
         } else {
             logger.error("User authentication is invalid. Please try again.");
-            throw new AutoServiceException(HttpStatus.UNAUTHORIZED, "User authentication is invalid. Please try again.");
-        }
+            throw new AutoServiceException("606", "User authentication is invalid. Please try again.");
+        }//HttpStatus.UNAUTHORIZED
     }
 
     @Override
@@ -132,8 +132,8 @@ public class UserServiceImpl implements UserService {
             emailService.sendEmail(email, content, "Forgot password");
         } else {
             logger.error("User with email:{} not found.", email);
-            throw new AutoServiceException(HttpStatus.BAD_REQUEST, String.format("User with email:%s not found.", email));
-        }
+            throw new AutoServiceException("608", String.format("User with email:%s not found.", email));
+        }//HttpStatus.BAD_REQUEST
     }
 
     private String encodeValue(String value) throws UnsupportedEncodingException {
@@ -149,7 +149,7 @@ public class UserServiceImpl implements UserService {
             userRepository.save(userToBeUpdated);
         } else {
             logger.error("Password update failed.User not found for Id:{}", user.getUserId());
-            throw new AutoServiceException(HttpStatus.INTERNAL_SERVER_ERROR, "Password update failed. User not found");
-        }
+            throw new AutoServiceException("609", "Password update failed. User not found");
+        }//HttpStatus.INTERNAL_SERVER_ERROR
     }
 }

@@ -22,8 +22,8 @@ public interface GenericService {
         }
         catch (IllegalArgumentException | ConfigurationException | MappingException e ) {
             logger.error("Source:{}, to destination by class type: {}, mapping exception: ", sourceEntity, destinationType, e);
-            throw new AutoServiceException(HttpStatus.INTERNAL_SERVER_ERROR, "Mapping exception occurred: " + e.getMessage());
-        }
+            throw new AutoServiceException("601", "Mapping exception occurred: " + e.getMessage());
+        }//HttpStatus.INTERNAL_SERVER_ERROR
     }
 
     default < T > T map(Object sourceEntity, Type destinationType) throws AutoServiceException {
@@ -32,7 +32,7 @@ public interface GenericService {
         }
         catch ( IllegalArgumentException | ConfigurationException | MappingException e ) {
             logger.error("Source:{}, to destination by type:{}, mapping exception : ", sourceEntity, destinationType, e);
-            throw new AutoServiceException(HttpStatus.INTERNAL_SERVER_ERROR, "Mapping exception occurred: " + e.getMessage());
+            throw new AutoServiceException("601", "Mapping exception occurred: " + e.getMessage());
         }
     }
 }
