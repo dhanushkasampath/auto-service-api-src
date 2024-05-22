@@ -17,8 +17,8 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @AllArgsConstructor
-@NoArgsConstructor
 @Data
+@NoArgsConstructor
 @Table(name = "user")
 public class User {
     @Id
@@ -34,4 +34,5 @@ public class User {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "otpId")
     private Otp otp;
+
 }

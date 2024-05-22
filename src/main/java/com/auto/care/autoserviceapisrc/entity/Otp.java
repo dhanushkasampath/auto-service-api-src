@@ -23,7 +23,4 @@ public class Otp extends AbstractEntity{
     private Long otpId;
     private String code;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "userId")
-    private User user;
 }
