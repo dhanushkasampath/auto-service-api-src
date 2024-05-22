@@ -95,7 +95,8 @@ public class UserController {
         try{
             userService.forgetPassword(email);
             return new ResponseEntity<>(HttpStatus.OK);
-        } catch (AutoServiceException e) {//every controller should be under these 2 catch blocks always
+        } catch (AutoServiceException e) {//every controller should be under these 2 catch blocks always(BusinessException and Exception). That is need for custom excetion handling
+            // But having try catch in controller is not encouraged. Instead use GlobalExceptionhandler
             ControllerException ce = new ControllerException(e.getErrorCode(), e.getErrorMessage());
             return new ResponseEntity<>(ce, HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
@@ -103,5 +104,8 @@ public class UserController {
             return new ResponseEntity<>(ce, HttpStatus.BAD_REQUEST);
         }
     }
+
+    //but why custom exception handling?
+    //Because all controllers may not need to handle same type of exceptions. in such case custom exceptions are important
 
 }
